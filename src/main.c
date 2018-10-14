@@ -3,25 +3,33 @@
  * Main
  */
 
-#define ERROR 0
 #define FALSE 0
 #define TRUE 1
 
 #include <getopt.h>
 #include <string.h>
-#include "file.h"
+#include <stdlib.h>
+#include <errno.h>
+#include <stdio.h>
 
 #define CMD_ENCODE 1
 #define CMD_DECODE 0
 #define CMD_NOENCODE 2
 #define FALSE 0
 #define TRUE 1
+#define ERROR 1
+#define OK 0
 
 #include "base64.h"
 
 /****************************
  * DECLARACION DE FUNCIONES *
  ****************************/
+
+typedef struct{
+    FILE* file;
+    char eof;
+} File;
 
 typedef struct {
     File input;
@@ -112,6 +120,32 @@ void CommandVersion();
  * Post: Datos procesados y escritos en el stream, si error devuelve 0, sino 1.
  */
 char _CommandEncodeDecode(CommandOptions *opt);
+
+/**
+ * Construye el TDA.
+ * Post: TDA construido
+ */
+void FileCreate(File *f);
+
+/**
+ * Abre un File, devuelve 0 (NULL) si falla
+ * Pre: Ptr a File Inicializado ,
+ *      Ruta a archivo, si es 0 (NULL) utiliza stdin
+ */
+char FileOpenForRead(File* file, const char* route);
+
+/**
+ * Abre un File, devuelve 0 (NULL) si falla
+ * Pre: Ptr a File Inicializado ,
+ *      Ruta a archivo, si es 0 (NULL) utiliza stdout
+ */
+char FileOpenForWrite(File* file, const char* route);
+
+/*
+ * Cierra archivo abierto
+ * Pre: Archivo previamente abierto
+ */
+int FileClose(File* file);
 
 /*********************************
  * FIN: DECLARACION DE FUNCIONES *
@@ -258,6 +292,52 @@ void CommandErrArg() {
     fprintf(stderr,"Examples:\n");
     fprintf(stderr,"  tp0 -a encode -i ~/input -o ~/output\n");
     fprintf(stderr,"  tp0 -a decode\n");
+}
+
+void FileCreate(File *file){
+    file->file = 0;
+    file->eof = 0;
+}
+
+char FileOpenForRead(File* file, const char *route ){
+    if(route == NULL) {
+        file->file = stdin;
+    } else {
+        file->file = fopen(route, "rb");
+        if (file->file == NULL) {
+            int err = errno;
+            fprintf(stderr, "File Open Error; %s\n", strerror(err));
+            return ERROR;
+        }
+    }
+    return OK;
+}
+
+char FileOpenForWrite(File* file, const char *route ) {
+    if(route == NULL) {
+        file->file = stdout;
+    } else {
+        file->file = fopen(route, "wb");
+        if (file->file == NULL) {
+            int err = errno;
+            fprintf(stderr, "File Open Error; %s\n", strerror(err));
+            return ERROR;
+        }
+    }
+    return OK;
+}
+
+int FileClose(File* file){
+    if(file->file == stdin || file->file == stdout)
+        return OK;
+
+    int result = fclose(file->file);
+    if (result == EOF){
+        int err = errno;
+        fprintf(stderr, "File Close Error; %s\n", strerror(err));
+        return ERROR;
+    }
+    return OK;
 }
 
 /********************************
