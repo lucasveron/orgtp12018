@@ -188,7 +188,7 @@ char CommandProcess(CommandOptions *opt) {
 }
 
 char _CommandEncodeDecode(CommandOptions *opt) {
-    unsigned char buf_decoded[3];
+/*  unsigned char buf_decoded[3];
     unsigned char buf_encoded[4];
     unsigned char count = 0;
     if(opt->encode_opt == CMD_ENCODE){
@@ -243,6 +243,7 @@ char _CommandEncodeDecode(CommandOptions *opt) {
 
         }
     }
+	*/
     return opt->error;
 }
 
