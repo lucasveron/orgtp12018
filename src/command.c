@@ -1,125 +1,11 @@
-/**
- * Created by gatti2602 on 12/09/18.
- * Main
- */
+//
+// Created by gatti2602 on 12/09/18.
+//
 
-#define ERROR 0
-#define FALSE 0
-#define TRUE 1
-
-#include <getopt.h>
+#include "command.h"
+#include "encode.h"
+#include "decode.h"
 #include <string.h>
-#include "file.h"
-
-#define CMD_ENCODE 1
-#define CMD_DECODE 0
-#define CMD_NOENCODE 2
-#define FALSE 0
-#define TRUE 1
-
-#include "base64.h"
-
-/****************************
- * DECLARACION DE FUNCIONES *
- ****************************/
-
-typedef struct {
-    File input;
-    File output;
-    const char* input_route;
-    const char* output_route;
-    char error;
-    char encode_opt;
-} CommandOptions;
-
-/**
- * Inicializa TDA CommandOptions
- * Pre: Puntero a Command Options escribible
- * Post: CommandOptions Inicializados a valores por default
- * Valores default:
- *      input: stdin
- *      output stdout
- *      error: FALSE
- *      encode_opt: decode
- */
-void CommandCreate(CommandOptions* opt);
-
-/**
- * Setea ruta de entrada
- * Pre: ruta valida
- * Post: ruta lista para abrir file
- */
-void CommandSetInput(CommandOptions* opt, const char* input);
-
-/**
- * Setea ruta de salida
- * Pre: ruta valida
- * Post: ruta lista para abrir file
- */
-void CommandSetOutput(CommandOptions* opt, const char* output);
-
-/**Setea Command Option
- * Pre: opt inicializado
- * Post: Setea el encoding.
- *      Si string no es encode/decode setea opt error flag.
- */
-void CommandSetEncodeOpt(CommandOptions* opt, const char* encode_opt);
-
-/**
- * Devuelve el flag de error
- */
-char CommandHasError(CommandOptions *opt);
-
-/**
- * Indica que hubo un error
- */
-void CommandSetError(CommandOptions *opt);
-
-/**
- * Ejecuta el comando
- * Pre: Asume parametros previamente validados y ok
- * Post: Ejecuta el comando generando la salida esperada
- *       Devuelve 0 si error y 1 si OK.
- */
-char CommandProcess(CommandOptions* opt);
-
-/**
- * Help Command
- * Imprime por salida estandar los distintos comandos posibles.
- * Pre: N/A
- * Post: N/A
- */
-void CommandHelp();
-
-/**
- * Imprime la ayuda por la salida de errores
- */
-void CommandErrArg();
-
-/**
- * Version Command
- * Imprime por salida estandar la version del codigo
- * Pre: N/A
- * Post: N/A
- */
-void CommandVersion();
-
-/**
- * Recibe los archivos abiertos y debe ejecutar la operacion de codificacion
- * Pre: opt->input posee el stream de entrada
- *      opt->output posee el stream de salida
- *      opt->encode_opt posee la opcion de codificacion
- * Post: Datos procesados y escritos en el stream, si error devuelve 0, sino 1.
- */
-char _CommandEncodeDecode(CommandOptions *opt);
-
-/*********************************
- * FIN: DECLARACION DE FUNCIONES *
- *********************************/
-
-/***************************
- * DEFINICION DE FUNCIONES *
- ***************************/
 
 void CommandHelp(){
     printf("Options:\n");
@@ -155,11 +41,16 @@ void CommandSetOutput(CommandOptions *opt, const char *output) {
 }
 
 void CommandSetEncodeOpt(CommandOptions *opt, const char *encode_opt) {
-	if(strcmp(encode_opt,"decode") == 0) {
-	    opt->encode_opt = CMD_DECODE;
-	} else {
-	    opt->encode_opt = CMD_ENCODE;
-	}
+    if(strcmp(encode_opt,"encode") == 0){
+        opt->encode_opt = CMD_ENCODE;
+    } else {
+        if(strcmp(encode_opt,"decode") == 0) {
+            opt->encode_opt = CMD_DECODE;
+        } else {
+            fprintf(stderr, "Encoding option should be encode/decode");
+            opt->error = TRUE;
+        }
+    }
 }
 
 char CommandHasError(CommandOptions *opt) {
@@ -257,65 +148,4 @@ void CommandErrArg() {
     fprintf(stderr,"Examples:\n");
     fprintf(stderr,"  tp0 -a encode -i ~/input -o ~/output\n");
     fprintf(stderr,"  tp0 -a decode\n");
-}
-
-/********************************
- * FIN: DEFINICION DE FUNCIONES *
- ********************************/
-
-int main(int argc, char** argv) {
-    struct option arg_long[] = {
-            {"input",   required_argument,  NULL,  'i'},
-            {"output",  required_argument,  NULL,  'o'},
-            {"action",  required_argument,  NULL,  'a'},
-            {"help",    no_argument,        NULL,  'h'},
-            {"version", no_argument,        NULL,  'V'},
-    };
-    char arg_opt_str[] = "i:o:a:hV";
-    int arg_opt;
-    int arg_opt_idx = 0;
-    char should_finish = FALSE;
-
-    CommandOptions cmd_opt;
-    CommandCreate(&cmd_opt);
-
-    if(argc == 1)
-        CommandSetError(&cmd_opt);
-
-    while((arg_opt =
-                   getopt_long(argc, argv, arg_opt_str, arg_long, &arg_opt_idx)) != -1 && !should_finish) {
-        switch(arg_opt){
-        	case 'i':
-        		CommandSetInput(&cmd_opt, optarg);
-        		break;
-        	case 'o':
-                CommandSetOutput(&cmd_opt, optarg);
-                break;
-        	case 'h':
-        		CommandHelp();
-                should_finish = TRUE;
-                break;
-        	case 'V':
-        		CommandVersion();
-                should_finish = TRUE;
-                break;
-        	case 'a':
-        	    CommandSetEncodeOpt(&cmd_opt, optarg);
-				break;
-        	default:
-        		CommandSetError(&cmd_opt);
-        		break;
-        }
-    }
-
-    if(should_finish)
-        return 0;
-
-    if(!CommandHasError(&cmd_opt)) {
-        CommandProcess(&cmd_opt);
-    } else {
-        CommandErrArg();
-        return 1;
-    }
-    return 0;
 }
