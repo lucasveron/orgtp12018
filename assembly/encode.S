@@ -1,0 +1,200 @@
+#include <mips/regdef.h>
+#include <sys/syscall.h>
+
+	.file	1 "encode.c"
+	#.section .mdebug.abi32
+	#.previous
+	#.abicalls
+	.data
+	.align	2
+	.type	encoding_table, @object
+	.size	encoding_table, 64
+encoding_table:
+	.byte	65
+	.byte	66
+	.byte	67
+	.byte	68
+	.byte	69
+	.byte	70
+	.byte	71
+	.byte	72
+	.byte	73
+	.byte	74
+	.byte	75
+	.byte	76
+	.byte	77
+	.byte	78
+	.byte	79
+	.byte	80
+	.byte	81
+	.byte	82
+	.byte	83
+	.byte	84
+	.byte	85
+	.byte	86
+	.byte	87
+	.byte	88
+	.byte	89
+	.byte	90
+	.byte	97
+	.byte	98
+	.byte	99
+	.byte	100
+	.byte	101
+	.byte	102
+	.byte	103
+	.byte	104
+	.byte	105
+	.byte	106
+	.byte	107
+	.byte	108
+	.byte	109
+	.byte	110
+	.byte	111
+	.byte	112
+	.byte	113
+	.byte	114
+	.byte	115
+	.byte	116
+	.byte	117
+	.byte	118
+	.byte	119
+	.byte	120
+	.byte	121
+	.byte	122
+	.byte	48
+	.byte	49
+	.byte	50
+	.byte	51
+	.byte	52
+	.byte	53
+	.byte	54
+	.byte	55
+	.byte	56
+	.byte	57
+	.byte	43
+	.byte	47
+	.text
+	.align	2
+	.globl	Encode
+	.ent	Encode
+Encode:
+	.frame	$fp,24,ra		# vars= 8, regs= 2/0, args= 0, extra= 8
+	#.mask	0x50000000,-4
+	#.fmask	0x00000000,0
+	.set	noreorder
+	.cpload	t9
+	.set	reorder
+	subu	sp,sp,24
+	.cprestore 0
+	sw	$fp,20(sp)
+	sw	gp,16(sp)
+	move	$fp,sp
+	sw	a0,24($fp)
+	sw	a1,28($fp)
+	sw	a2,32($fp)
+	lw	v0,24($fp)
+	lbu	v0,0(v0)
+	sb	v0,8($fp)
+	lw	v0,24($fp)
+	addu	v0,v0,1
+	lbu	v0,0(v0)
+	sb	v0,9($fp)
+	lw	v0,24($fp)
+	addu	v0,v0,2
+	lbu	v0,0(v0)
+	sb	v0,10($fp)
+	lbu	v0,8($fp)
+	srl	v0,v0,2
+	sb	v0,11($fp)
+	lw	v1,32($fp)
+	lbu	v0,11($fp)
+	lbu	v0,encoding_table(v0)
+	sb	v0,0(v1)
+	lbu	v0,8($fp)
+	sll	v0,v0,6
+	sb	v0,12($fp)
+	lbu	v0,12($fp)
+	srl	v0,v0,2
+	sb	v0,12($fp)
+	lbu	v0,9($fp)
+	srl	v0,v0,4
+	lbu	v1,12($fp)
+	or	v0,v1,v0
+	sb	v0,12($fp)
+	lw	v0,32($fp)
+	addu	v1,v0,1
+	lbu	v0,12($fp)
+	lbu	v0,encoding_table(v0)
+	sb	v0,0(v1)
+	lw	v0,32($fp)
+	addu	v1,v0,2
+	li	v0,61			# 0x3d
+	sb	v0,0(v1)
+	lw	v0,32($fp)
+	addu	v1,v0,3
+	li	v0,61			# 0x3d
+	sb	v0,0(v1)
+	lw	v1,28($fp)
+	li	v0,3			# 0x3
+	bne	v1,v0,$L2
+	lbu	v0,10($fp)
+	srl	v0,v0,6
+	sb	v0,13($fp)
+	lbu	v0,9($fp)
+	sll	v0,v0,4
+	sb	v0,14($fp)
+	lbu	v0,14($fp)
+	srl	v0,v0,2
+	sb	v0,14($fp)
+	lbu	v1,13($fp)
+	lbu	v0,14($fp)
+	or	v0,v1,v0
+	sb	v0,13($fp)
+	lw	v0,32($fp)
+	addu	v1,v0,2
+	lbu	v0,13($fp)
+	lbu	v0,encoding_table(v0)
+	sb	v0,0(v1)
+	lbu	v0,10($fp)
+	sll	v0,v0,2
+	sb	v0,15($fp)
+	lbu	v0,15($fp)
+	srl	v0,v0,2
+	sb	v0,15($fp)
+	lw	v0,32($fp)
+	addu	v1,v0,3
+	lbu	v0,15($fp)
+	lbu	v0,encoding_table(v0)
+	sb	v0,0(v1)
+	b	$L1
+$L2:
+	lw	v1,28($fp)
+	li	v0,2			# 0x2
+	bne	v1,v0,$L1
+	lbu	v0,10($fp)
+	srl	v0,v0,6
+	sb	v0,15($fp)
+	lbu	v0,9($fp)
+	sll	v0,v0,4
+	sb	v0,14($fp)
+	lbu	v0,14($fp)
+	srl	v0,v0,2
+	sb	v0,14($fp)
+	lbu	v1,15($fp)
+	lbu	v0,14($fp)
+	or	v0,v1,v0
+	sb	v0,15($fp)
+	lw	v0,32($fp)
+	addu	v1,v0,2
+	lbu	v0,15($fp)
+	lbu	v0,encoding_table(v0)
+	sb	v0,0(v1)
+$L1:
+	move	sp,$fp
+	lw	$fp,20(sp)
+	addu	sp,sp,24
+	j	ra
+	.end	Encode
+	.size	Encode, .-Encode
+	.ident	"GCC: (GNU) 3.3.3 (NetBSD nb3 20040520)"
