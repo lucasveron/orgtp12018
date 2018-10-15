@@ -138,7 +138,7 @@ Encode:
 	sb	v0,11($fp)
 	# Cargo en v1 el puntero al output.
 	lw	v1,32($fp)
-	# ???NECESARIO???
+	# Cargo en v0 el byte shifteado.
 	lbu	v0,11($fp)
 	# Cargo en v0 el caracter(byte) de la tabla encoding(encoding_table)
 	lbu	v0,encoding_table(v0)
@@ -150,7 +150,7 @@ Encode:
 	sll	v0,v0,6
 	# Guardo el resultado del shift en el Stack Frame.
 	sb	v0,12($fp)
-	# ???NECESARIO???
+	# Cargo el byte sin signo shifteado.
 	lbu	v0,12($fp)
 	# Muevo 2 'posiciones' hacia la derecha(shift 2).
 	srl	v0,v0,2
@@ -213,7 +213,7 @@ Encode:
 	sll	v0,v0,4
 	# Guardo en el stack frame(14) el nuevo valor.
 	sb	v0,14($fp)
-	# ???NECESARIO???
+	# Cargo en v0 el byte shifteado sin signo.
 	lbu	v0,14($fp)
 	# Hago un shift rigth de 2.
 	srl	v0,v0,2
@@ -244,7 +244,7 @@ Encode:
 	sll	v0,v0,2
 	# Guardo en el stack frame el valor shifteado.
 	sb	v0,15($fp)
-	# ???NECESARIO???
+	# Cargo el byte sin signo shifteado.
 	lbu	v0,15($fp)
 	# Hago un shift rigth de 2.
 	srl	v0,v0,2
@@ -283,7 +283,7 @@ buffer_size_2:
 	sll	v0,v0,4
 	# Guardo en el stack frame nuevo valor shifteado.
 	sb	v0,14($fp)
-	# ???NECESARIO???
+	# Cargo en v0 el byte shifteado sin signo.
 	lbu	v0,14($fp)
 	# Hago un shift right de 2 posiciones.
 	srl	v0,v0,2
