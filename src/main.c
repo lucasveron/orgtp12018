@@ -232,40 +232,7 @@ char _CommandEncodeDecode(CommandOptions *opt) {
        	int filein = fileno((opt->input).file);
 	int fileout = fileno((opt->output).file);
 	base64_decode(filein, fileout);
-	/* while (!FileEofReached(&opt->input) && !CommandHasError(opt)) {
-            unsigned int read = FileRead(&opt->input, buf_encoded, 4);
-            if (read > 0) {   // Solo es 0 si alcance el EOF
-                if (read != 4) {  //Siempre debo leer 4 sino el formato es incorrecto
-                    fprintf(stderr, "Longitud de archivo no es multiplo de 4\n");
-                    CommandSetError(opt);
-                } else {
-                    ++count;
-                    if (count == 18) { // 19 * 4 = 76 bytes
-                        unsigned char aux;
-                        FileRead(&opt->input, &aux, 1);
-                        count = 0;
-                    }
-                    if (Decode(buf_encoded, buf_decoded)) {
-                        char aux = 0;
-                        if (buf_encoded[2] == '=')
-                            ++aux;
-                        if (buf_encoded[3] == '=')
-                            ++aux;
-
-                        FileWrite(&opt->output, buf_decoded, 3 - aux);
-                    } else {
-                        fprintf(stderr, "Caracteres invalidos en archivo codificado: ");
-                        unsigned int i;
-                        for (i = 0; i < 4; ++i)
-                            fprintf(stderr, "%c", buf_encoded[i]);
-                        CommandSetError(opt);
-                    }
-                }
-            }
-
-
-        }
-    */}
+   }
 	
     return opt->error;
 }
