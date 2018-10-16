@@ -195,7 +195,7 @@ El programa implementado satisface los siguientes requerimientos, que se detalla
 	\item{\textbf{ABI}}\\
 	 El código presentado utilice la ABI explicada en clase([2] y [3]).
 	\item{\textbf{Syscalls}}\\
-	Se aclara que desde el código assembly no se llaman funciones que no son escritas originalmente en assembly. Por lo contrario, desde el código C sí se invoca código assembly, particularmente se invocan algunos de los system calls disponibles en NetBSD (en particular, \textit{\textbf{SYSread}} y \textit{\textbf{SYSwrite}}).
+	Se aclara que desde el código assembly no se llaman funciones que no son escritas originalmente en assembly. Por lo contrario, desde el código C sí se invoca código assembly, particularmente se invocan algunos de los system calls disponibles en NetBSD (en particular, \textit{\textbf{SYS\_read}} y \textit{\textbf{SYS\_write}}).
 \end{itemize}
 
 Como en el Trabajo Práctico \#0, el programa se estructura en los siguientes pasos:
@@ -239,20 +239,15 @@ En caso de que no se encuentre alguna opción, se muestra el mensaje de ayuda al
 	\item \underline{Encode/Decode:} una vez que se procesó correctamente las opciones de la línea de comandos se procede a llamar a las funciones correspondientes que ejecutarán la operación de ENCODE o DECODE dependiendo del argumento pasado en la línea de comandos. Como se especifico más arriba está parte del programa es implementada en lenguaje assembly MIPS y cumplen lo siguientes:
 \begin{itemize}
 	\item{DECODE}\\
-La operación de DECODE se ejecuta el siguiente código:
-
-
-	Básicamente lo que se realiza es la lectura del archivo para procesarlo teniendo en cuenta la longitud del archivo a procesar y el padding a decodificar. La función \texttt{Decode()} retorna un buffer de 3 caracteres con el decode de 4 caracteres en base64. Se debe cumplir:\\
+La operación de DECODE está implementada en el archivo \textit{\textbf{decode.S}} que contiene una función
+\texttt{Decode:} que básicamente lo que realiza es la lectura del archivo para procesarlo teniendo en cuenta la longitud del archivo a procesar y el padding a decodificar. Esta función retorna un buffer de 3 caracteres con el decode de 4 caracteres en base64. Se debe cumplir:\\
 
  * Pre: el buffer input contiene 4 caracteres. El buffer output tiene por lo menos 3 caracteres
  * Post: retorna un buffer de 3 byte con los caracteres en ASCII. retorna 0 si error 1 si ok.
 
 	\item{ENCODE}\\
-La operación de ENCODE se ejecuta el siguiente código:
-
-
-
-Básicamente lo que se realiza es la lectura del archivo para procesarlo en la función \texttt{Encode()} en donde recibe 3 caracteres en buffer y los convierte en 4 caracteres codificados en output. Se debe cumplir:\\
+La operación de ENCODE está implementada en el archivo \textit{\textbf{encode.S}} que contiene una función
+\texttt{Encode()} que básicamente lo que realiza es la lectura del archivo para procesarlo en la función  en donde recibe 3 caracteres en buffer y los convierte en 4 caracteres codificados en output. Se debe cumplir:\\
 
  * Pre: el buffer contiene length caracteres (1 a 3) y todos los caracteres son validos
  * Post: retorna un buffer de 4 byte con los caracteres en base64.
@@ -593,13 +588,22 @@ El trabajo práctico nos permitió desarrollar una API para procesar archivos tr
 
 \newpage
 
+\subsubsection{Header file base64.h}\label{base64.h}
+\lstinputlisting[language=C]{../src/base64.h}
+
+\newpage
+
 \subsubsection{Assembly base64.S}\label{base64.S}
 \lstinputlisting[style=customasm]{../src/base64.S}
 
 \newpage
 
-\subsubsection{Header file base64.h}\label{base64.h}
-\lstinputlisting[language=C]{../src/base64.h}
+\subsubsection{Assembly encode.S}\label{encode.S}
+\lstinputlisting[style=customasm]{../assembly/encode.S}
 
+\newpage
+
+\subsubsection{Assembly decode.S}\label{decode.S}
+\lstinputlisting[style=customasm]{../assembly/decode.S}
 
 \end{document}
