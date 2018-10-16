@@ -4,4 +4,4 @@
 ---------------------------------------
 ## Compilación
 
-gcc -std=c99 -Wall -pedantic -Werror -O0 -o tp1 main.c base64.S encode.S
+gcc -std=c99 -Wall -pedantic -Werror -O0 -ggdb -o tp1 main.c base64.S 
