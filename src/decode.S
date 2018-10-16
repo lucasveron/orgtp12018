@@ -2,9 +2,9 @@
 #include <sys/syscall.h>
 	
 	.file	1 "decode.c"
-	#.section .mdebug.abi32
-	#.previous
-	#.abicalls
+	//.section .mdebug.abi32
+	//.previous
+	//.abicalls
 	.data
 	.align	2
 	.type	decoding_table, @object
@@ -83,145 +83,145 @@ decoding_table_size:
 	.align	2
 	.globl	DecodeChar
 	.ent	DecodeChar
-	.frame	$fp,24,$ra		# vars= 8, regs= 2/0, args= 0, extra= 8
+	.frame	$fp,24,ra		// vars= 8, regs= 2/0, args= 0, extra= 8
 	.mask	0x50000000,-4
 	.fmask	0x00000000,0
 	.set	noreorder
-	.cpload	$t9
+	.cpload	t9
 	.set	reorder
-	subu	$sp,$sp,24
+	subu	sp,sp,24
 	.cprestore 0
-	sw	$fp,20($sp)
-	sw	$gp,16($sp)
-	move	$fp,$sp
-	move	$v0,$a0
-	sb	$v0,8($fp)
-	sb	$zero,9($fp)
+	sw	$fp,20(sp)
+	sw	gp,16(sp)
+	move	$fp,sp
+	move	v0,a0
+	sb	v0,8($fp)
+	sb	zero,9($fp)
 $L2:
-	lbu	$v0,9($fp)
-	lw	$v1,decoding_table_size
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L5
+	lbu	v0,9($fp)
+	lw	v1,decoding_table_size
+	slt	v0,v0,v1
+	bne	v0,zero,$L5
 	b	$L3
 $L5:
-	lbu	$v0,9($fp)
-	lbu	$v1,decoding_table($v0)
-	lb	$v0,8($fp)
-	bne	$v1,$v0,$L4
-	lbu	$v0,9($fp)
-	sw	$v0,12($fp)
+	lbu	v0,9($fp)
+	lbu	v1,decoding_table(v0)
+	lb	v0,8($fp)
+	bne	v1,v0,$L4
+	lbu	v0,9($fp)
+	sw	v0,12($fp)
 	b	$L1
 $L4:
-	lbu	$v0,9($fp)
-	addu	$v0,$v0,1
-	sb	$v0,9($fp)
+	lbu	v0,9($fp)
+	addu	v0,v0,1
+	sb	v0,9($fp)
 	b	$L2
 $L3:
-	lb	$v1,8($fp)
-	li	$v0,61			# 0x3d
-	bne	$v1,$v0,$L7
-	sw	$zero,12($fp)
+	lb	v1,8($fp)
+	li	v0,61			// 0x3d
+	bne	v1,v0,$L7
+	sw	zero,12($fp)
 	b	$L1
 $L7:
-	li	$v0,100			# 0x64
-	sw	$v0,12($fp)
+	li	v0,100			// 0x64
+	sw	v0,12($fp)
 $L1:
-	lw	$v0,12($fp)
-	move	$sp,$fp
-	lw	$fp,20($sp)
-	addu	$sp,$sp,24
-	j	$ra
+	lw	v0,12($fp)
+	move	sp,$fp
+	lw	$fp,20(sp)
+	addu	sp,sp,24
+	j	ra
 	.end	DecodeChar
 	.size	DecodeChar, .-DecodeChar
 	.align	2
 	.globl	Decode
 	.ent	Decode
 Decode:
-	.frame	$fp,64,$ra		# vars= 24, regs= 4/0, args= 16, extra= 8
+	.frame	$fp,64,ra		// vars= 24, regs= 4/0, args= 16, extra= 8
 	.set	noreorder
-	.cpload	$t9
+	.cpload	t9
 	.set	reorder
-	subu	$sp,$sp,64
+	subu	sp,sp,64
 	.cprestore 16
 
-	sw	$ra,60($sp)
-	sw	$fp,56($sp)
-	sw	$gp,52($sp)
-	sw	$s0,48($sp)
+	sw	ra,60(sp)
+	sw	$fp,56(sp)
+	sw	gp,52(sp)
+	sw	s0,48(sp)
 
-	#Trabajo con $fp
-	move	$fp,$sp
+	//Trabajo con $fp
+	move	$fp,sp
 
-	#Se carga el archivo en a0, el buffer en a1 y la cantidad de bytes en a2
-	sw	$a0,64($fp)
-	sw	$a1,68($fp)
-	sw	$a2,5
-	sw	$zero,32($fp)
+	//Se carga el archivo en a0, el buffer en a1 y la cantidad de bytes en a2
+	sw	a0,64($fp)
+	sw	a1,68($fp)
+	sw	a2,5
+	sw	zero,32($fp)
 	
-	addu	$a1,$fp,32
-	move	$a0,zero
-	#Primera lectura  
+	addu	a1,$fp,32
+	move	a0,zero
+	//Primera lectura  
 	jal	DecodeChar
 
-	#destino de lectura
+	//destino de lectura
 	addu	a1,$fp,32 
-	#input fd
+	//input fd
 	lw	a0,64($fp) 
-	#Leo 4 bytes
+	//Leo 4 bytes
 	li	a2,4 
 	li v0,SYS_read
-	#leo
+	//leo
 	syscall
-	#cargo lo que se leyó en v0 
+	//cargo lo que se leyó en v0 
 	sw	v0,40($fp)
 
-#Ciclo de lectura
+//Ciclo de lectura
 $L9:
 	lw	t1,40($fp)
-	sltu	$v0,$v0,4
+	sltu	v0,v0,4
 	blez	t1,$L12
-	lw	t1,32($fp) #cargo state
+	lw	t1,32($fp) //cargo state
 	bnez	t1,$L12
 
-	#destino
+	//destino
 	addu a2,$fp,24
-	lw	a0,64($fp) #fd in
-	lw	a1,68($fp) #fd out
-	lw	a3,40($fp) #read
+	lw	a0,64($fp) //fd in
+	lw	a1,68($fp) //fd out
+	lw	a3,40($fp) //read
 	
 	jal	DecodeChar
 	
-	#el resultado de decode se asigna a state
+	//el resultado de decode se asigna a state
 	sw	v0,32($fp)
 
-	#se vuelve a repetir
+	//se vuelve a repetir
 	addu	v0,$fp,32 
 	move	a1,v0
 	move	a0,zero
 	li	a2,5	
 	jal	DecodeChar
 
-	#destino de lectura
+	//destino de lectura
 	addu a0,$fp,32 
-	#input fd
+	//input fd
 	lw	a1,64($fp)
-	#Leo 4 bytes
+	//Leo 4 bytes
 	li	a2,4 
 
 	li v0,SYS_read
 	syscall
 	
 	sw	v0,40($fp)
-	#Sigue el ciclo
+	//Sigue el ciclo
 	b $L9
 $L8:
-	lw	$v0,40($fp)
-	move	$sp,$fp
-	lw	$ra,60($sp)
-	lw	$fp,56($sp)
-	lw	$s0,48($sp)
-	addu	$sp,$sp,64
-	j	$ra
+	lw	v0,40($fp)
+	move	sp,$fp
+	lw	ra,60(sp)
+	lw	$fp,56(sp)
+	lw	s0,48(sp)
+	addu	sp,sp,64
+	j	ra
 	.end	Decode
 	.size	Decode, .-Decode
 	.ident	"GCC: (GNU) 3.3.3 (NetBSD nb3 20040520)"

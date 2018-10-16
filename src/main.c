@@ -222,31 +222,17 @@ char CommandProcess(CommandOptions *opt) {
 }
 
 char _CommandEncodeDecode(CommandOptions *opt) {
-   /* unsigned char buf_decoded[3];
-    unsigned char buf_encoded[4];
-    unsigned char count = 0;*/
     if(opt->encode_opt == CMD_ENCODE){
-        /*while(!FileEofReached(&opt->input)){
-            memset(buf_decoded, 0, 3);
-            unsigned int read = FileRead(&opt->input, buf_decoded, 3);
-            if (read > 0) {
-                Encode(buf_decoded, read, buf_encoded);
-                FileWrite(&opt->output, buf_encoded, 4);
-                ++count;
-                if (count == 18) { // 19 * 4 = 76 bytes
-                    FileWrite(&opt->output, (unsigned char *) "\n", 1);
-                    count = 0;
-                }
-
-            }
-        }*/
 	int filein = fileno((opt->input).file);
 	int fileout = fileno((opt->output).file);
 	base64_encode(filein, fileout);
     }
 
-  /*  if (opt->encode_opt == CMD_DECODE) {
-        while (!FileEofReached(&opt->input) && !CommandHasError(opt)) {
+   if (opt->encode_opt == CMD_DECODE) {
+       	int filein = fileno((opt->input).file);
+	int fileout = fileno((opt->output).file);
+	base64_decode(filein, fileout);
+	/* while (!FileEofReached(&opt->input) && !CommandHasError(opt)) {
             unsigned int read = FileRead(&opt->input, buf_encoded, 4);
             if (read > 0) {   // Solo es 0 si alcance el EOF
                 if (read != 4) {  //Siempre debo leer 4 sino el formato es incorrecto
@@ -279,8 +265,8 @@ char _CommandEncodeDecode(CommandOptions *opt) {
 
 
         }
-    }
-	*/
+    */}
+	
     return opt->error;
 }
 
