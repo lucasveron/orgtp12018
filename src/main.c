@@ -225,13 +225,18 @@ char _CommandEncodeDecode(CommandOptions *opt) {
     if(opt->encode_opt == CMD_ENCODE){
 	int filein = fileno((opt->input).file);
 	int fileout = fileno((opt->output).file);
-	base64_encode(filein, fileout);
+	int res = base64_encode(filein, fileout);
+	if(res != 0)
+		fprintf(stderr, "%s\n",errmsg[res]);
+		
     }
 
    if (opt->encode_opt == CMD_DECODE) {
        	int filein = fileno((opt->input).file);
 	int fileout = fileno((opt->output).file);
-	base64_decode(filein, fileout);
+	int res = base64_decode(filein, fileout);
+	if(res != 0)
+		fprintf(stderr, "%s\n",errmsg[res]);
    }
 	
     return opt->error;

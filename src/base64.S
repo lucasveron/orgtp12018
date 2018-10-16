@@ -57,6 +57,18 @@
 	.align	2
 sep:	.ascii 	"\n"
 pad: 	.ascii	"="
+	.globl errmsg
+errmsg:
+	.word base64_ok, base64_err1, base64_err2, base64_err3
+	.size errmsg, 16
+base64_ok:
+	.asciiz "OK"
+base64_err1:
+	.asciiz "I/O Error"
+base64_err2:
+	.asciiz "File no es multiplo de 4"
+base64_err3: 
+	.asciiz "File contiene caracteres invalidos"
 	.text
 	.align	2
 	.globl	base64_encode
@@ -95,8 +107,8 @@ base64_encode_loop:
 	li	a2, 3
 	li	v0, SYS_read
 	syscall
-	beqz	v0, base64_encode_return	//Si no lei nada finalizo //TODO: Chequear por error
-	
+	beqz	v0, base64_encode_return_ok	//Si no lei nada finalizo 
+	blt	v0, 0, base64_encode_io_error
 	//Paso parametros y llamo a Encode
 	addi	a0, $fp, 20
 	move	a1, v0
@@ -120,8 +132,13 @@ base64_encode_loop:
 	li	s1, 0
 	j base64_encode_loop
 		
-base64_encode_return:	// return;
+base64_encode_return_ok:	// return;
+	li	v0, 0
+	j base64_encode_return
+base64_encode_io_error:
+	li	v0, 1
 	// restauro callee-saved regs
+base64_encode_return:
 	lw	gp, 24(sp)
 	lw	$fp, 28(sp)
 	lw	ra, 32(sp)
@@ -169,7 +186,9 @@ base64_decode_loop:
 	li	a2, 4
 	li	v0, SYS_read
 	syscall
-	beqz	v0, base64_decode_return	//Si no lei nada finalizo //TODO: Chequear por error
+	beqz	v0, base64_decode_return_ok	//Si no lei nada finalizo
+	blt	v0, 0, base64_decode_ioerror
+	blt	v0, 4, base64_decode_nomult 
 	//Controlo si hay padding
 	li	s3, 0				//s3 = cant de padding a borrar
 	lbu	s2, 43($fp)			//s2 aux control padding
@@ -195,7 +214,10 @@ not_sep:
 	addi	a1, $fp, 16
 	la 	t9, Decode
 	jal 	ra, t9
-				
+	
+	//Chequeo error
+	beq	v0, DECODE_ERROR, base64_decode_decode_err	
+			
 	//Grabo en file
 	lw 	a0, 44($fp)	// File descriptor out
 	addi	a1, $fp, 16	// Apunto a buffer out
@@ -204,7 +226,17 @@ not_sep:
 	li	v0, SYS_write
 	syscall   
 	j base64_decode_loop
-		
+base64_decode_return_ok:
+	li v0, 0
+	j base64_decode_return
+base64_decode_ioerror:
+	li v0, 1
+	j base64_decode_return
+base64_decode_nomult:		
+	li v0, 2
+	j base64_decode_return
+base64_decode_decode_err:		
+	li v0, 3
 base64_decode_return:	// return;
 	// restauro callee-saved regs
 	lw	gp, 24(sp)
