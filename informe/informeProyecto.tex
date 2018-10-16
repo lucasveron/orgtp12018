@@ -174,7 +174,7 @@ Tomando como referencia el Trabajo Práctico \#0 en donde el programa contenía 
 
 \begin{itemize}
 	\item{main.c:} contendrá todo el código necesario para el procesamiento de las opciones de línea de comandos, apertura y cierre de archivos (de ser necesario), y reporte de errores (stderr). Desde aquí se llama a las funciones de encoding y decoding siguientes.
-	\item {base64.S:} contendrá el cádigo MIPS32 assembly con las funciones base64 encode() y base64 decode(), y las funciones y estructuras de datos auxiliares para realizar los cómputo de encoding y decoding, que
+	\item {base64.S:} contendrá el cádigo MIPS32 assembly con las funciones base64\_encode() y base64\_decode(), y las funciones y estructuras de datos auxiliares para realizar los cómputo de encoding y decoding, que
 los alumnos crean convenientes. También contendrá la definición en asembly de un vector equivalente al siguiente vector C: const char\* errmsg[]. Dicho vector contendrá los mensajes de error que las funciones antes mencionadas puedan generar, y cuyo índice es el código de error devuelto por las mismas.
 	\item{Los header files pertinentes} (al menos, base64.h, con los prototipos de las funciones mencionadas, a incluir en \textit{\textbf{main.c}}), y la declaración del vector extern const char\* errmsg[]).
 
@@ -187,10 +187,10 @@ A su vez, las funciones MIPS32 base64 encode() y base64 decode() antes mencionad
 		int base64 decode(int infd, int outfd)
 	\end{lstlisting}
 
-Ambas funciones reciben por \textit{infd} y \textit{outfd} los \textit{file descriptors} correspondientes a los archivos de entrada y salida pre-abiertos por \textit{\textbf{main.c}}, la primera función realizará el encoding a base 64 de su entrada, y la segunda función el decoding de base 64 se su entrada.
+Ambas funciones reciben por \textit{infd} y \textit{outfd} los \textit{file descriptors} correspondientes a los archivos de entrada y salida pre-abiertos por \textit{\textbf{main.c}}, la primera función realizará el encoding a base 64 de su entrada, y la segunda función el decoding de base 64 de su entrada.
 Ante un error, ambas funciones volverán con un código de error numérico índice del vector de mensajes de error de \textit{\textbf{base64.h}}), o cero en caso de realizar el procesamiento de forma exitosa.
 
-El programa implementado satisface los siguientes requerimientos, que se detalla a continuación:
+El programa implementado satisface los siguientes requerimientos, que se detallan a continuación:
 \begin{itemize}
 	\item{\textbf{ABI}}\\
 	 El código presentado utilice la ABI explicada en clase([2] y [3]).
@@ -240,17 +240,11 @@ En caso de que no se encuentre alguna opción, se muestra el mensaje de ayuda al
 \begin{itemize}
 	\item{DECODE}\\
 La operación de DECODE está implementada en el archivo \textit{\textbf{decode.S}} que contiene una función
-\texttt{Decode:} que básicamente lo que realiza es la lectura del archivo para procesarlo teniendo en cuenta la longitud del archivo a procesar y el padding a decodificar. Esta función retorna un buffer de 3 caracteres con el decode de 4 caracteres en base64. Se debe cumplir:\\
-
- * Pre: el buffer input contiene 4 caracteres. El buffer output tiene por lo menos 3 caracteres
- * Post: retorna un buffer de 3 byte con los caracteres en ASCII. retorna 0 si error 1 si ok.
+\texttt{Decode()} que básicamente lo que realiza es la lectura del archivo para procesarlo teniendo en cuenta la longitud del archivo a procesar y el padding a decodificar. Esta función recibe los files descriptor de entrada y salida procesándolo, según la ABI requerida y luego en la salida si no hubo errores se retorna cero sino se retorna un código de error númerico .
 
 	\item{ENCODE}\\
 La operación de ENCODE está implementada en el archivo \textit{\textbf{encode.S}} que contiene una función
-\texttt{Encode()} que básicamente lo que realiza es la lectura del archivo para procesarlo en la función  en donde recibe 3 caracteres en buffer y los convierte en 4 caracteres codificados en output. Se debe cumplir:\\
-
- * Pre: el buffer contiene length caracteres (1 a 3) y todos los caracteres son validos
- * Post: retorna un buffer de 4 byte con los caracteres en base64.
+\texttt{Encode()} que básicamente lo que realiza es la lectura del archivo para procesarlo teniendo en cuenta la longitud del archivo a procesar y el padding a decodificar. Esta función recibe los files descriptor de entrada y salida procesándolo, según la ABI requerida y luego en la salida si no hubo errores se retorna cero sino se retorna un código de error númerico .
 	\end{itemize}
 
 	\end{itemize}
@@ -279,52 +273,15 @@ Se indica a continuación detalles respecto a los parámetros:
 
 \subsection{Compilación del programa}
 
-Para obtener un ejecutable, se creó un archivo \texttt{makefile} cuyo contenido es:
-	\begin{lstlisting}[language=C]
-CC = gcc
-CFLAGS = -o0 -g -Wall -Werror -pedantic -std=c99
-
-OBJECTS = command.o encode.o file.c
-EXEC = tp0
-
-VALGRIND = valgrind --track-origins=yes --leak-check=full
-VALGRIND-V = $(VALGRIND) -v
-
-all: $(EXEC)
-
-command.o: command.c command.h
-	$(CC) $(CFLAGS) -c command.c -o command.o
-encode.o: encode.c encode.h
-	$(CC) $(CFLAGS) -c encode.c -o encode.o
-file.o: file.c file.h
-	$(CC) $(CFLAGS) -c file.c -o file.o
-
-$(EXEC): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) main.c -o $(EXEC) -lm
-
-run: $(EXEC)
-	./$(EXEC)
-
-valgrind: $(EXEC)
-	$(VALGRIND) ./$(EXEC)
-
-valgrind-verb: $(EXEC)
-	$(VALGRIND-V) ./$(EXEC)
-
-clean:
-	rm -f *.o $(EXEC)
-	\end{lstlisting}
-
-
 Para ejecutarlo, posicionarse en el directorio \texttt{src/} y ejecutar el siguiente comando:
 \begin{lstlisting}
-$ make
+$ gcc -std=c99 -Wall -o0 -g -o tp1 main.c base64.S
 \end{lstlisting}
 
 Para proceder a la ejecución del programa, se debe llamar a:
 
 \begin{lstlisting}
-$ ./tp0
+$ ./tp1
 \end{lstlisting}
 
 seguido de los parámetros que se desee modificar, los cuales se indicaron en la sección 1.2.
@@ -332,12 +289,11 @@ seguido de los parámetros que se desee modificar, los cuales se indicaron en la
 En caso de ser entrada estándar (stdin) se podrá ejecutar de la siguiente forma:
 
 \begin{lstlisting}
-$ echo texto | ./tp0 -a encode
+$ echo texto | ./tp1 -a encode
 \end{lstlisting}
 
 También en este caso, se indican a continuación los parámetros a usar.
 
-Para el caso de hacerlo en el emulador GXemul que provee la cátedra, utilizando la máquina virtual que contiene el sistema operativo NetBSD, no se utilizó el archivo Makefile, la compilación se realizó con la herramienta \texttt{gcc}.
 \newpage
 
 
@@ -512,7 +468,7 @@ Se indicaran a continuación lo siguiente: comandos para ejecutarlas, líneas de
     \item Mensaje de ayuda\\
     
 \begin{lstlisting}
-$ ./tp0 -h  o ./tp0 --help
+$ ./tp1 -h  o ./tp1 --help
 
 Options:
   -V, --version    Print version and quit.
@@ -521,8 +477,8 @@ Options:
   -o, --output     Location of the output file.
   -a, --action     Program action: encode (default) or decode.
 Examples:
-  tp0 -a encode -i ~/input -o ~/output
-  tp0 -a decode
+  tp1 -a encode -i ~/input -o ~/output
+  tp1 -a decode
 
 
 \end{lstlisting}     
@@ -530,14 +486,14 @@ Examples:
 	\item Mensaje de version\\
 
             \begin{lstlisting}
-$ ./tp0 -V  o ./tp0 --version
-Version: 0.1
+$ ./tp1 -V  o ./tp1 --version
+Version: 0.2
              \end{lstlisting}  
          
          
     \item Archivo de entrada no válido
             \begin{lstlisting}
-$ ./tp0 -i archivoInvalido.txt
+$ ./tp1 -i archivoInvalido.txt
 
 Invalid Arguments
 Options:
@@ -547,8 +503,8 @@ Options:
   -o, --output     Location of the output file.
   -a, --action     Program action: encode (default) or decode.
 Examples:
-  tp0 -a encode -i ~/input -o ~/output
-  tp0 -a decode
+  tp1 -a encode -i ~/input -o ~/output
+  tp1 -a decode
 
 
              \end{lstlisting}  
@@ -605,5 +561,69 @@ El trabajo práctico nos permitió desarrollar una API para procesar archivos tr
 
 \subsubsection{Assembly decode.S}\label{decode.S}
 \lstinputlisting[style=customasm]{../assembly/decode.S}
+
+\newpage
+
+\subsubsection{Assembly command.s}\label{command.s}
+\lstinputlisting[style=customasm]{../assembly/command.s}
+
+\newpage
+
+\subsubsection{Assembly decode.s}\label{decode.s}
+\lstinputlisting[style=customasm]{../assembly/decode.s}
+
+\newpage
+
+\subsubsection{Assembly file.s}\label{file.s}
+\lstinputlisting[style=customasm]{../assembly/file.s}
+
+\newpage
+
+\subsubsection{Assembly main.s}\label{main.s}
+\lstinputlisting[style=customasm]{../assembly/main.s}
+
+\newpage
+
+\section{Stack frame}
+
+\subsection{Stack frame base\_64decode}
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=14cm]{base64decodeStackFrame}
+    \caption{Stack frame base64decode}
+  \label{fig:base64decodeStackFrame}
+\end{figure}
+
+\subsection{Stack frame base\_64encode}
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=14cm]{base64encodeStackFrame}
+    \caption{Stack frame base64encode}
+  \label{fig:base64encodeStackFrame}
+\end{figure}
+
+\subsection{Stack frame decodeChar}
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=14cm]{decodeCharStackFrame}
+    \caption{Stack frame decodeChar}
+  \label{fig:decodeCharStackFrame}
+\end{figure}
+
+\subsection{Stack frame decode}
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=14cm]{decodeStackFrame}
+    \caption{Stack frame decode}
+  \label{fig:decodeStackFrame}
+\end{figure}
+
+\subsection{Stack frame encode}
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=14cm]{encodeStackFrame}
+    \caption{Stack frame encode}
+  \label{fig:encodeStackFrame}
+\end{figure}
 
 \end{document}
