@@ -168,14 +168,14 @@ void CommandHelp(){
 }
 
 void CommandVersion() {
-    printf("Version: 0.1\n");
+    printf("Version: 0.2\n");
 }
 
 void CommandCreate(CommandOptions *opt) {
     FileCreate(&opt->input);
     FileCreate(&opt->output);
     opt->error = FALSE;
-    opt->encode_opt = CMD_NOENCODE;
+    opt->encode_opt = CMD_ENCODE;
     opt->input_route = 0;
     opt->output_route = 0;
 }
@@ -207,16 +207,16 @@ void CommandSetError(CommandOptions *opt) {
 char CommandProcess(CommandOptions *opt) {
     opt->error = FileOpenForRead(&opt->input, opt->input_route);
 
-    if(!opt->error)
+    if(opt->error != ERROR){
         opt->error = FileOpenForWrite(&opt->output, opt->output_route);
 
-    if(!opt->error){
-        opt->error = _CommandEncodeDecode(opt);
-        FileClose(&opt->input);
-        FileClose(&opt->output);
-    }
-    else {
-        FileClose(&opt->input);
+	if(opt->error != ERROR){
+		opt->error = _CommandEncodeDecode(opt);
+		FileClose(&opt->input);
+		FileClose(&opt->output);
+        } else {
+		FileClose(&opt->input);
+        }
     }
     return opt->error;
 }
