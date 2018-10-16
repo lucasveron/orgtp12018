@@ -9,7 +9,7 @@
 #define OFFSET_FP_ENCODE 12
 #define OFFSET_GP_ENCODE 8
 
-#define OFFSET_BYTE_AUX_5 7
+#define OFFSET_B4_AUX 7
 #define OFFSET_B3_AUX_2 6
 #define OFFSET_B3_AUX 5
 #define OFFSET_B2_AUX 4
@@ -262,20 +262,20 @@ Encode:
 	# Hago un shift left de 2.
 	sll	v0,v0,2
 	# Guardo en el stack frame el valor shifteado.
-	sb	v0,OFFSET_BYTE_AUX_5($fp)
+	sb	v0,OFFSET_B4_AUX($fp)
 	# Cargo el byte sin signo shifteado.
-	lbu	v0,OFFSET_BYTE_AUX_5($fp)
+	lbu	v0,OFFSET_B4_AUX($fp)
 	# Hago un shift rigth de 2.
 	srl	v0,v0,2
 	# Guardo en el stack frame el valor shifteado.
-	sb	v0,OFFSET_BYTE_AUX_5($fp)
+	sb	v0,OFFSET_B4_AUX($fp)
 	# Cargo en v0 el puntero al output.
 	lw	v0,OFFSET_OUTPUT_ENCODE($fp)
 	# Sumo 3 a la dirección del output(output[3]).
 	# Me desplazo dentro del output array.
 	addu	v1,v0,3
 	# Cargo en v0 el ultimo valor shifteado guardado.
-	lbu	v0,OFFSET_BYTE_AUX_5($fp)
+	lbu	v0,OFFSET_B4_AUX($fp)
 	# Busco en la tabla de encoding el caracter que corresponde.
 	# Luego cargo el byte en v0.
 	lbu	v0,encoding_table(v0)
@@ -295,7 +295,7 @@ buffer_size_2:
 	# Hago un shift right de 6.
 	srl	v0,v0,6
 	# Guardo en el stack frame el ultimo valor shifteado. 
-	sb	v0,OFFSET_BYTE_AUX_5($fp)
+	sb	v0,OFFSET_B4_AUX($fp)
 	# Cargo el 2do byte del buffer en v0.
 	lbu	v0,OFFSET_B2($fp)
 	# Hago un shift left de 4 posiciones.
@@ -309,19 +309,19 @@ buffer_size_2:
 	# Guardo en el stack frame el valor shifteado.
 	sb	v0,OFFSET_B3_AUX_2($fp)
 	# Cargo en v1 uno de los valores shiftedos(b3aux).
-	lbu	v1,OFFSET_BYTE_AUX_5($fp)
+	lbu	v1,OFFSET_B4_AUX($fp)
 	# Cargo en v0 uno de los valores shiftedos(b3aux2).
 	lbu	v0,OFFSET_B3_AUX_2($fp)
 	# Hago un 'or' entre b3aux y b3aux2.
 	or	v0,v1,v0
 	# Guardo en el stack frame el resutado del 'or'.
-	sb	v0,OFFSET_BYTE_AUX_5($fp)
+	sb	v0,OFFSET_B4_AUX($fp)
 	# Cargo en v0 el puntero al output.
 	lw	v0,OFFSET_OUTPUT_ENCODE($fp)
 	# Me desplazo dentro del output array y lo guardo en v1.
 	addu	v1,v0,2
 	# Cargo en v0 ultimo resultado del 'or'
-	lbu	v0,OFFSET_BYTE_AUX_5($fp)
+	lbu	v0,OFFSET_B4_AUX($fp)
 	# Busco en la tabla de encoding el caracter que corresponde.
 	# Luego cargo el byte en v0.
 	lbu	v0,encoding_table(v0)
