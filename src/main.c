@@ -163,8 +163,8 @@ void CommandHelp(){
     printf("  -o, --output     Location of the output file.\n");
     printf("  -a, --action     Program action: encode (default) or decode.\n");
     printf("Examples:\n");
-    printf("  tp0 -a encode -i ~/input -o ~/output\n");
-    printf("  tp0 -a decode\n");
+    printf("  tp1 -a encode -i ~/input -o ~/output\n");
+    printf("  tp1 -a decode\n");
 }
 
 void CommandVersion() {
@@ -251,8 +251,8 @@ void CommandErrArg() {
     fprintf(stderr,"  -o, --output     Location of the output file.\n");
     fprintf(stderr,"  -a, --action     Program action: encode (default) or decode.\n");
     fprintf(stderr,"Examples:\n");
-    fprintf(stderr,"  tp0 -a encode -i ~/input -o ~/output\n");
-    fprintf(stderr,"  tp0 -a decode\n");
+    fprintf(stderr,"  tp1 -a encode -i ~/input -o ~/output\n");
+    fprintf(stderr,"  tp1 -a decode\n");
 }
 
 void FileCreate(File *file){

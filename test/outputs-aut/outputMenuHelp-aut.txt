@@ -5,5 +5,5 @@ Options:
   -o, --output     Location of the output file.
   -a, --action     Program action: encode (default) or decode.
 Examples:
-  tp0 -a encode -i ~/input -o ~/output
-  tp0 -a decode
+  tp1 -a encode -i ~/input -o ~/output
+  tp1 -a decode

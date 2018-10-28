@@ -3,9 +3,19 @@
 echo "#########################################"
 echo "########## Tests automaticos  ###########"
 echo "#########################################"
+echo
 
-mkdir ./outputs
+echo "Se guardaran los archivos resultantes de los tests en el directorio outputs"
 
+if [ -d "./outputs" ]
+then
+   echo "El directorio outputs existe, por lo tanto se elimina su contenido."
+   rm -r outputs/*
+else
+   echo "El directorio outputs no existe, por lo tanto se creara."
+   mkdir outputs
+fi
+echo
 echo "#---------# COMIENZA test ejercicio 0 archivo vacio #--------#"
 touch ./outputs-aut/zero.txt
 ./tp1 -a encode -i ./outputs-aut/zero.txt -o ./outputs-aut/zero.txt.b64
@@ -141,6 +151,8 @@ done
 
 echo "#---------# FIN test ejercicio encode/decode random #--------#"
 echo "#------------------------------------------------------------#"
+
+echo
 
 echo "##########################################"
 echo "####### FIN Tests automaticos  ###########"
