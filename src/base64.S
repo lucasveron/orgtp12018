@@ -1,7 +1,6 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-
 #define STACK_FRAME_ENCODE 16
 
 #define OFFSET_OUTPUT_ENCODE 24
@@ -39,22 +38,22 @@
 #define OFFSET_I_DECODECHAR 4
 #define OFFSET_CHARACTER_DECODECHAR 0
 
-#define STACK_FRAME_DECODE 64
+#define STACK_FRAME_DECODE 32//64
 
-#define OFFSET_BUFFER_OUTPUT_ENCODE 68
-#define OFFSET_BUFFER_INPUT_ENCODE 64
-#define OFFSET_RA_DECODE 60
-#define OFFSET_FP_DECODE 56
-#define OFFSET_GP_DECODE 52
-#define OFFSET_S0_DECODE 48
-#define OFFSET_CHAR1_AUX_ENCODE 37
-#define OFFSET_CHAR0_AUX_ENCODE 36
-#define OFFSET_CHARS3_ENCODE 27
-#define OFFSET_CHARS2_ENCODE 26
-#define OFFSET_CHARS1_ENCODE 25
-#define OFFSET_CHARS0_ENCODE 24
-#define OFFSET_RETURN_ENCODE 20
-#define OFFSET_I_DECODE 32
+#define OFFSET_BUFFER_OUTPUT_ENCODE 36//68
+#define OFFSET_BUFFER_INPUT_ENCODE 32//64
+#define OFFSET_RA_DECODE 24//28//60
+#define OFFSET_FP_DECODE 20//24//56
+#define OFFSET_GP_DECODE 16//20//52
+//#define OFFSET_S0_DECODE 16//48
+#define OFFSET_CHAR1_AUX_ENCODE 13//37
+#define OFFSET_CHAR0_AUX_ENCODE 12//36
+#define OFFSET_I_DECODE 8//32
+#define OFFSET_CHARS3_ENCODE 7//27
+#define OFFSET_CHARS2_ENCODE 6//26
+#define OFFSET_CHARS1_ENCODE 5//25
+#define OFFSET_CHARS0_ENCODE 4//24
+#define OFFSET_RETURN_ENCODE 0//20
 
 	.data
 	.align	2
@@ -701,7 +700,7 @@ Decode:
 	sw	ra,OFFSET_RA_DECODE(sp)
 	sw	$fp,OFFSET_FP_DECODE(sp)
 	sw	gp,OFFSET_GP_DECODE(sp)
-	sw	s0,OFFSET_S0_DECODE(sp)
+	//sw	s0,OFFSET_S0_DECODE(sp)
 
 	// De aquí al final de la función uso $fp en lugar de sp.
 	move	$fp,sp
@@ -860,7 +859,7 @@ return_zero:
 	// Restauro ra,fp y gp.
 	lw	ra,OFFSET_RA_DECODE(sp)
 	lw	$fp,OFFSET_FP_DECODE(sp)
-	lw	s0,OFFSET_S0_DECODE(sp)
+	//lw	s0,OFFSET_S0_DECODE(sp)
 
 	// Destruyo el stack frame.
 	addu	sp,sp,STACK_FRAME_DECODE
