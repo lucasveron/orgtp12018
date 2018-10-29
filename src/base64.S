@@ -155,26 +155,31 @@ base64_encode_return:
 	.ent	base64_decode
 base64_decode:
 	// debugging info: descripcion del stack frame
-	.frame	$fp, 40, ra	// $fp: registro usado como frame pointer
-				// 32: tamañodel stack frame
+	.frame	$fp, 56, ra	// $fp: registro usado como frame pointer
+				// 56: tamañodel stack frame
 				// ra: registro que almacena el return address
 	// bloque para codigo PIC
 	.set	noreorder	// apaga reordenamiento de instrucciones
 	.cpload t9		// directiva usada para codigo PIC
 	.set	reorder		// enciende reordenamiento de instrucciones
 	// creo stack frame
-	subu	sp, sp, 40	// 4 (SRA) + 2 (LTA) + 4 (ABA)
+	subu	sp, sp, 56	// 8 (SRA) + 2 (LTA) + 4 (ABA)
 	// directiva para codigo PIC
-	.cprestore 24		// inserta aqui "sw gp, 24(sp)",
+	.cprestore 44		// inserta aqui "sw gp, 24(sp)",
 				// mas "lw gp, 24(sp)" luego de cada jal.
 	// salvado de callee-saved regs en SRA	
-	sw	$fp, 28(sp)
-	sw	ra, 32(sp)
+	sw	$fp, 48(sp)
+	sw	ra, 52(sp)
+	sw	s1, 24(sp)
+	sw	s2, 28(sp)
+	sw	s3, 32(sp)
+	sw	s4, 36(sp)
+	sw	s5, 40(sp)
 	// de aqui al fin de la funcion uso $fp en lugar de sp.
 	move	$fp, sp
 	// salvo 1er arg (siempre)
-	sw	a0, 40($fp)	// a0 contiene file input
-	sw	a1, 44($fp)	// a1 contiene file output 
+	sw	a0, 56($fp)	// a0 contiene file input
+	sw	a1, 60($fp)	// a1 contiene file output 
 	li	s1, 0		// count = 0
 	la	s5, pad
 	lbu	s5, 0(s5)
@@ -183,7 +188,7 @@ base64_decode_loop:
 	sw	zero, 20($fp)	//input = 0
 	
 	//Leo archivo
-	lw	a0, 40($fp)
+	lw	a0, 56($fp)
 	addi	a1, $fp, 20
 	li	a2, 4
 	li	v0, SYS_read
@@ -204,7 +209,7 @@ ctl2:
 	//Controlo salto de linea
 	addi s1, s1, 1		// count++
 	bne s1, 18, not_sep 	// Si count = 18 elimino un caracter
-	lw 	a0, 40($fp)	// file in
+	lw 	a0, 56($fp)	// file in
 	addi	a1, $fp, 16	// grabo en out buffer, luego se pisa
 	li	a2, 1		// length = 1
 	li	v0, SYS_read
@@ -221,7 +226,7 @@ not_sep:
 	beq	v0, DECODE_ERROR, base64_decode_decode_err	
 			
 	//Grabo en file
-	lw 	a0, 44($fp)	// File descriptor out
+	lw 	a0, 60($fp)	// File descriptor out
 	addi	a1, $fp, 16	// Apunto a buffer out
 	li	s4, 3
 	subu	a2, s4, s3	// a2 = 3 - cant de padding 
@@ -241,11 +246,16 @@ base64_decode_decode_err:
 	li v0, 3
 base64_decode_return:	// return;
 	// restauro callee-saved regs
-	lw	gp, 24(sp)
-	lw	$fp, 28(sp)
-	lw	ra, 32(sp)
+	lw	gp, 44(sp)
+	lw	$fp, 48(sp)
+	lw	ra, 52(sp)
+	lw	s1, 24(sp)
+	lw	s2, 28(sp)
+	lw	s3, 32(sp)
+	lw	s4, 36(sp)
+	lw	s5, 40(sp)
 	// destruyo stack frame
-	addu	sp, sp, 40
+	addu	sp, sp, 56
 	// vuelvo a funcion llamante
 	jr	ra
 	.end	base64_decode
