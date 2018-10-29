@@ -1,5 +1,7 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
+
+
 #define STACK_FRAME_ENCODE 16
 
 #define OFFSET_OUTPUT_ENCODE 24
@@ -28,13 +30,14 @@
 
 #define EQUAL_CHAR 61
 
-#define STACK_FRAME_DECODECHAR 32
+#define STACK_FRAME_DECODECHAR 28
 
-#define OFFSET_FP_DECODECHAR 32
-#define OFFSET_GP_DECODECHAR 28
-#define OFFSET_CHARACTER_DECODECHAR 16
-#define OFFSET_I_DECODECHAR 20
-#define OFFSET_RETURN_DECODECHAR 24
+#define OFFSET_RA_DECODECHAR 24
+#define OFFSET_FP_DECODECHAR 20
+#define OFFSET_GP_DECODECHAR 16
+#define OFFSET_RETURN_DECODECHAR 8
+#define OFFSET_I_DECODECHAR 4
+#define OFFSET_CHARACTER_DECODECHAR 0
 
 #define STACK_FRAME_DECODE 64
 
@@ -590,6 +593,7 @@ DecodeChar:
 	.cprestore 0
 	
 	// Guardo fp y gp en el stack frame
+	sw      ra,OFFSET_RA_DECODECHAR(sp)
 	sw	$fp,OFFSET_FP_DECODECHAR(sp)
 	sw	gp,OFFSET_GP_DECODECHAR(sp)
 	// De aquí al final de la función uso $fp en lugar de sp.
@@ -666,6 +670,8 @@ return_decode_index_or_zero:
 	move	sp,$fp
 	// Restauro fp
 	lw	$fp,OFFSET_FP_DECODECHAR(sp)
+	// Restauro ra
+	lw      ra,OFFSET_RA_DECODECHAR(sp)
 	// Destruyo el stack frame
 	addu	sp,sp,STACK_FRAME_DECODECHAR
 	// Regreso el control a la función llamante.
