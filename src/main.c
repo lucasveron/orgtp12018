@@ -321,17 +321,16 @@ int main(int argc, char** argv) {
     CommandOptions cmd_opt;
     CommandCreate(&cmd_opt);
 
-    if(argc == 1)
-        CommandSetError(&cmd_opt);
-
     while((arg_opt =
                    getopt_long(argc, argv, arg_opt_str, arg_long, &arg_opt_idx)) != -1 && !should_finish) {
         switch(arg_opt){
         	case 'i':
+		if(strcmp(optarg, "-") != 0)
         		CommandSetInput(&cmd_opt, optarg);
-        		break;
+        	break;
         	case 'o':
-                CommandSetOutput(&cmd_opt, optarg);
+		if(strcmp(optarg, "-") != 0)
+                	CommandSetOutput(&cmd_opt, optarg);
                 break;
         	case 'h':
         		CommandHelp();

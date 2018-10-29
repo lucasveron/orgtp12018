@@ -177,7 +177,7 @@ base64_decode:
 	sw	a1, 44($fp)	// a1 contiene file output 
 	li	s1, 0		// count = 0
 	la	s5, pad
-	
+	lbu	s5, 0(s5)
 	//Limpio input para read
 base64_decode_loop:
 	sw	zero, 20($fp)	//input = 0
@@ -193,11 +193,11 @@ base64_decode_loop:
 	blt	v0, 4, base64_decode_nomult 
 	//Controlo si hay padding
 	li	s3, 0				//s3 = cant de padding a borrar
-	lbu	s2, 43($fp)			//s2 aux control padding
+	lbu	s2, 23($fp)			//s2 aux control padding
 	bne	s2, s5, ctl1
 	addi 	s3, s3, 1
 ctl1:	
-	lbu	s2, 42($fp)			//s2 aux control padding
+	lbu	s2, 22($fp)			//s2 aux control padding
 	bne	s2, s5, ctl2
 	addi 	s3, s3, 1
 ctl2:	
