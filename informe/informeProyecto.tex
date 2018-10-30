@@ -168,7 +168,7 @@
 
 \newpage
 
-\subsection{Diseño e implementación}
+\section{Diseño e implementación}
 
 Tomando como referencia el Trabajo Práctico \#0 en donde el programa contenía la lógica tanto del codificador y decodificador y de otras funciones auxiliares, para este nuevo programa, se requirió reescribirlo, de forma tal que quede organizado de la siguiente forma:
 
@@ -245,12 +245,21 @@ La operación de DECODE está implementada en el archivo \textit{\textbf{decode.
 	\item{ENCODE}\\
 La operación de ENCODE está implementada en el archivo \textit{\textbf{encode.S}} que contiene una función
 \texttt{Encode()} que básicamente lo que realiza es la lectura del archivo para procesarlo teniendo en cuenta la longitud del archivo a procesar y el padding a decodificar. Esta función recibe los files descriptor de entrada y salida procesándolo, según la ABI requerida y luego en la salida si no hubo errores se retorna cero sino se retorna un código de error númerico .
+	
+	\item{base64\_encode}\\
+La función recibe por parámetro a \textit{infd} y \textit{outfd}, los \textit{file descriptors} correspondientes a los archivos de entrada y salida pre-abiertos por \textit{\textbf{main.c}}. La función función realiza el encoding a base 64 en assembly \textit{\textbf{MIPS}}, cumpliendo con lo requerido por  la \textit{\textbf{ABI}} , de la entrada de datos, y vuelca el resultado en el archivo de salida.
+Ante un error, la función volverá un código de error numérico índice del vector de mensajes de error de \textit{\textbf{base64.h}}), o cero en caso de realizar el procesamiento de forma exitosa.
+
+	\item{base64\_decode}\\	
+La función recibe por parámetro a \textit{infd} y \textit{outfd}, los \textit{file descriptors} correspondientes a los archivos de entrada y salida pre-abiertos por \textit{\textbf{main.c}}. La función función realiza el decoding a base 64 en assembly \textit{\textbf{MIPS}}, cumpliendo con lo requerido por  la \textit{\textbf{ABI}}, de la entrada de datos, y vuelca el resultado en el archivo de salida.
+Ante un error, la función volverá un código de error numérico índice del vector de mensajes de error de \textit{\textbf{base64.h}}), o cero en caso de realizar el procesamiento de forma exitosa.
+	
 	\end{itemize}
 
 	\end{itemize}
 
 
-\subsection{Parámetros del programa}
+\section{Parámetros del programa}
 
 Se detallan a continuación los parámetros del programa
 
@@ -259,7 +268,7 @@ Se detallan a continuación los parámetros del programa
     \item -V: Indica la versión del programa.
     \item -i: Archivo de entrada del programa.
     \item -o: Archivo de salida del programa.
-    \item -a: Acción a llevar a cabo: codificación o decodificación.
+    \item -a: Acción a llevar a cabo: codificación(default) o decodificación.
 \end{itemize}
 
 Se indica a continuación detalles respecto a los parámetros:
@@ -271,11 +280,11 @@ Se indica a continuación detalles respecto a los parámetros:
     \item en caso de que se use la entrada estándar (con comando echo texto $|$ ./tp0 -a encode) y luego se especifique un archivo de salida con -i, prevalecerá el establecido por parámetro.
 \end{itemize}
 
-\subsection{Compilación del programa}
+\section{Compilación del programa}
 
 Para ejecutarlo, posicionarse en el directorio \texttt{src/} y ejecutar el siguiente comando:
 \begin{lstlisting}
-$ gcc -std=c99 -Wall -o0 -g -o tp1 main.c base64.S
+$ ggcc -std=c99 -Wall -pedantic -Werror -O0 -ggdb -o tp1 main.c base64
 \end{lstlisting}
 
 Para proceder a la ejecución del programa, se debe llamar a:
@@ -306,13 +315,23 @@ Para la ejecución del siguiente script se debe copiar, se debe ubicar el archiv
 \begin{lstlisting}
 #!/bin/bash
 
-echo "#########################################"
-echo "########## Tests automaticos  ###########"
-echo "#########################################"
+echo "##################################################################################"
+echo "############################## Tests automaticos  ################################"
+echo "##################################################################################"
+echo
 
-mkdir ./outputs
+echo "Se guardaran los archivos resultantes de los tests en el directorio outputs"
 
-echo "#---------# COMIENZA test ejercicio 0 archivo vacio #--------#"
+if [ -d "./outputs" ]
+then
+   echo "El directorio outputs existe, por lo tanto se elimina su contenido."
+   rm -r outputs/*
+else
+   echo "El directorio outputs no existe, por lo tanto se creara."
+   mkdir outputs
+fi
+echo
+echo "#################### COMIENZA test ejercicio 0 archivo vacio #####################"
 touch ./outputs-aut/zero.txt
 ./tp1 -a encode -i ./outputs-aut/zero.txt -o ./outputs-aut/zero.txt.b64
 ls -l ./outputs-aut/zero.txt.b64
@@ -322,9 +341,9 @@ if diff -b ./outputs-aut/zero.txt ./outputs-aut/zero_ok.txt; then
 else echo ERROR;
 fi
 
-echo "#---------# FIN test ejercicio 0 archivo vacio #--------#"
-echo "#-------------------------------------------------------#"
-echo "#---------# COMIENZA test ejercicio 1 archivo vacio sin -a #--------#"
+echo "####################### FIN test ejercicio 0 archivo vacio #######################"
+echo "##################################################################################"
+echo "################# COMIENZA test ejercicio 1 archivo vacio sin -a #################"
 
 touch ./outputs-aut/zero.txt
 ./tp1 -i ./outputs-aut/zero.txt -o ./outputs-aut/zero.txt.b64
@@ -335,17 +354,17 @@ if diff -b ./outputs-aut/zero.txt ./outputs-aut/zero_ok.txt; then
 else echo ERROR;
 fi
 
-echo "#---------# FIN test ejercicio 1 archivo vacio sin -a #--------#"
-echo "#--------------------------------------------------------------#"
-echo "#---------# COMIENZA test ejercicio 2 stdin y stdout #---------#"
+echo "################### FIN test ejercicio 1 archivo vacio sin -a ####################"
+echo "##################################################################################"
+echo "#################### COMIENZA test ejercicio 2 stdin y stdout ####################"
 
 echo -n Man | ./tp1 -a encode > ./outputs/outputEncode.txt
 if diff -b ./outputs-aut/outputEncode-aut.txt ./outputs/outputEncode.txt; then echo "[OK]"; else
 	echo ERROR;
 fi
 
-echo "#---------# FIN test ejercicio 2 stdin y stdout #--------#"
-echo "#--------------------------------------------------------#"
+echo "####################### FIN test ejercicio 2 stdin y stdout ######################"
+echo "##################################################################################"
 echo "#---------# COMIENZA test ejercicio 3 stdin y stdout #--------#"
 
 echo -n TWFu | ./tp1 -a decode > ./outputs/outputDecode.txt
@@ -353,17 +372,8 @@ if diff -b ./outputs-aut/outputDecode-aut.txt ./outputs/outputDecode.txt; then e
 	echo ERROR;
 fi
 
-echo "#---------# FIN test ejercicio 3 stdin y stdout #--------#"
-echo "#--------------------------------------------------------#"
-echo "#---------# COMIENZA test ejercicio 3 help sin parámetros #--------#"
-
-./tp1 > ./outputs/outputMenuHelp.txt
-if diff -b ./outputs-aut/outputMenuHelp-aut.txt ./outputs/outputMenuH.txt; then echo "[OK]"; else
-	echo ERROR;
-fi
-
-echo "#---------# FIN test ejercicio 3 help sin parámetros #--------#"
-echo "#-----------------------------------------------------#"
+echo "####################### FIN test ejercicio 3 stdin y stdout ######################"
+echo "##################################################################################"
 echo "#----------# COMIENZA test menu help (-h) #----------#"
 
 ./tp1 -h > ./outputs/outputMenuH.txt
@@ -372,9 +382,9 @@ if diff -b ./outputs-aut/outputMenuHelp-aut.txt ./outputs/outputMenuH.txt; then 
 	echo ERROR;
 fi
 
-echo "#----------# FIN test menu version (-h) #----------#"
-echo "#-----------------------------------------------------#"
-echo "#----------# COMIENZA test menu help (--help) #----------#"
+echo "########################### FIN test menu version (-h) ###########################"
+echo "##################################################################################"
+echo "######################## COMIENZA test menu help (--help) ########################"
 
 ./tp1 --help > ./outputs/outputMenuHelp.txt
 
@@ -382,33 +392,33 @@ if diff -b ./outputs-aut/outputMenuHelp-aut.txt ./outputs/outputMenuHelp.txt; th
 		echo ERROR;
 fi
 
-echo "#----------# FIN test menu version (--help) #----------#"
-echo "#-----------------------------------------------------#"
-echo "#----------# COMIENZA test menu version (-V) #----------#"
+echo "######################### FIN test menu version (--help) #########################"
+echo "##################################################################################"
+echo "######################## COMIENZA test menu version (-V) #########################"
 
 ./tp1 -V > ./outputs/outputMenuV.txt
 
 if diff -b ./outputs-aut/outputMenuVersion-aut.txt ./outputs/outputMenuV.txt; then echo "[OK]"; else
 		echo ERROR;
 fi
-echo "#----------# FIN test menu version (-V) #----------#"
-echo "#-----------------------------------------------------#"
-echo "#----------# COMIENZA test menu version (--version) #----------#"
+echo "########################### FIN test menu version (-V) ###########################"
+echo "##################################################################################"
+echo "##################### COMIENZA test menu version (--version) #####################"
 
 ./tp1 --version > ./outputs/outputMenuVersion.txt
 
 if diff -b ./outputs-aut/outputMenuVersion-aut.txt ./outputs/outputMenuVersion.txt; then echo "[OK]"; else
 		echo ERROR;
 fi
-echo "#----------# FIN test menu version (--version) #----------#"
-echo "#-----------------------------------------------------#"
-echo "#---------# COMIENZA test ejercicio encode/decode #--------#"
+echo "####################### FIN test menu version (--version) ########################"
+echo "##################################################################################"
+echo "###################### COMIENZA test ejercicio encode/decode #####################"
 
 echo xyz | ./tp1 -a encode | ./tp1 -a decode | od -t c
 
-echo "#---------# FIN test ejercicio encode #--------#"
-echo "#-----------------------------------------------------#"
-echo "#---------# COMIENZA test ejercicio longitud maxima 76 #--------#"
+echo "########################### FIN test ejercicio encode ############################"
+echo "##################################################################################"
+echo "################### COMIENZA test ejercicio longitud maxima 76 ###################"
 
 yes | head -c 1024 | ./tp1 -a encode > ./outputs/outputSize76.txt
 
@@ -416,9 +426,9 @@ if diff -b ./outputs-aut/outputSize76-aut.txt ./outputs/outputSize76.txt; then e
 		echo ERROR;
 fi
 
-echo "#---------# FIN test ejercicio longitud maxima 76 #--------#"
-echo "#-----------------------------------------------------#"
-echo "#---------# COMIENZA test ejercicio decode 1024 #--------#"
+echo "###################### FIN test ejercicio longitud maxima 76 #####################"
+echo "##################################################################################"
+echo "####################### COMIENZA test ejercicio decode 1024 ######################"
 
 yes | head -c 1024 | ./tp1 -a encode | ./tp1 -a decode | wc -c > ./outputs/outputSize1024.txt
 
@@ -426,9 +436,9 @@ if diff -b ./outputs-aut/outputSize1024-aut.txt ./outputs/outputSize1024.txt; th
 		echo ERROR;
 fi
 
-echo "#---------# FIN test ejercicio decode 1024#--------#"
-echo "#-----------------------------------------------------#"
-echo "#---------# COMIENZA test ejercicio encode/decode random #--------#"
+echo "######################### FIN test ejercicio decode 1024 #########################"
+echo "##################################################################################"
+echo "################## COMIENZA test ejercicio encode/decode random ##################"
 
 n=1;
 while :; do
@@ -445,71 +455,78 @@ n=`expr $n + 1`;
 rm -f /tmp/in.bin /tmp/out.b64 /tmp/out.bin
 done
 
-echo "#---------# FIN test ejercicio encode/decode random #--------#"
-echo "#------------------------------------------------------------#"
+echo "#################### FIN test ejercicio encode/decode random #####################"
+echo "##################################################################################"
 
-echo "##########################################"
-echo "####### FIN Tests automaticos  ###########"
-echo "##########################################"
+echo
+
+echo "##################################################################################"
+echo "########################### FIN Tests automaticos  ###############################"
+echo "##################################################################################"
 \end{lstlisting}
 
 El cual no presenta errores en ninguna de las corridas llevadas a cabo.
 
 
+\subsection{Casos de prueba}
+
 Todas las pruebas que se presentan a continuación, están codificadas en los archivos de prueba ***.txt de forma que puedan ejecutarse y comprobar los resultados obtenidos.
 
 Se indicaran a continuación lo siguiente: comandos para ejecutarlas, líneas de código que las componen y resultado esperado.
 
-
-\subsubsection{Generales}
-
-
 \begin{itemize}
-    \item Mensaje de ayuda\\
-    
-\begin{lstlisting}
+
+	\item \textit{\textbf{Mensaje de ayuda}}\\
+	Ejecutando el comando:
+	\begin{lstlisting}
 $ ./tp1 -h  o ./tp1 --help
-
-Options:
-  -V, --version    Print version and quit.
-  -h, --help       Print this information.
-  -i, --input      Location of the input file.
-  -o, --output     Location of the output file.
-  -a, --action     Program action: encode (default) or decode.
-Examples:
-  tp1 -a encode -i ~/input -o ~/output
-  tp1 -a decode
-
-
-\end{lstlisting}     
+	\end{lstlisting}
+\lstinputlisting[language=C]{../test/outputs-aut/outputMenuHelp-aut.txt}      
      
-	\item Mensaje de version\\
-
-            \begin{lstlisting}
+	\item \textit{\textbf{Mensaje de version}}\\
+	Ejecutando el comando:
+	\begin{lstlisting}
 $ ./tp1 -V  o ./tp1 --version
-Version: 0.2
-             \end{lstlisting}  
-         
-         
-    \item Archivo de entrada no válido
-            \begin{lstlisting}
-$ ./tp1 -i archivoInvalido.txt
+	\end{lstlisting}  
+\lstinputlisting[language=C]{../test/outputs-aut/outputMenuVersion-aut.txt} 
 
-Invalid Arguments
-Options:
-  -V, --version    Print version and quit.
-  -h, --help       Print this information.
-  -i, --input      Location of the input file.
-  -o, --output     Location of the output file.
-  -a, --action     Program action: encode (default) or decode.
-Examples:
-  tp1 -a encode -i ~/input -o ~/output
-  tp1 -a decode
+	\item \textit{\textbf{Archivo vacío}}\\
+	Ejecutando el comando:
+	\begin{lstlisting}
+$ ./tp1 -a encode -i ./outputs-aut/zero.txt -o ./outputs-aut/zero.txt.b64
+	\end{lstlisting}  
+\lstinputlisting[language=C]{../test/outputs-aut/zero_ok.txt}
 
+	\item \textit{\textbf{Codificación}}\\
+	Ejecutando el comando:
+	\begin{lstlisting}
+$ echo -n Man | ./tp1 -a encode
+	\end{lstlisting}  
+\lstinputlisting[language=C]{../test/outputs-aut/outputEncode-aut.txt} 
 
-             \end{lstlisting}  
+	\item \textit{\textbf{Decodificación}}\\
+	Ejecutando el comando:
+	\begin{lstlisting}
+$ echo -n TWFu | ./tp1 -a decode
+	\end{lstlisting}  
+\lstinputlisting[language=C]{../test/outputs-aut/outputDecode-aut.txt}  
 
-\end{itemize}
+	\item \textit{\textbf{Test de verificación para que el programa no genere líneas con más de 76 de longitud}} \\
+	Ejecutando el comando:
+	\begin{lstlisting}
+$ yes | head -c 1024 | ./tp1 -a encode
+	\end{lstlisting}  
+\lstinputlisting[language=C]{../test/outputs-aut/outputSize76-aut.txt} 
+	
+\newpage
+	\item \textit{\textbf{Verificamos que la cantidad de líneas sea 1024}}\\
+	Ejecutando el comando:
+	\begin{lstlisting}
+$ yes | head -c 1024 | ./tp1 -a encode | ./tp1 -a decode | wc -c
+	\end{lstlisting}  
+\lstinputlisting[language=C]{../test/outputs-aut/outputSize1024-aut.txt}
+
+	\end{itemize}
 
 
 \newpage
