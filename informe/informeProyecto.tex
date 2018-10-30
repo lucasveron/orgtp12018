@@ -511,6 +511,7 @@ $ echo -n TWFu | ./tp1 -a decode
 	\end{lstlisting}  
 \lstinputlisting[language=C]{../test/outputs-aut/outputDecode-aut.txt}  
 
+\newpage
 	\item \textit{\textbf{Test de verificación para que el programa no genere líneas con más de 76 de longitud}} \\
 	Ejecutando el comando:
 	\begin{lstlisting}
@@ -518,7 +519,7 @@ $ yes | head -c 1024 | ./tp1 -a encode
 	\end{lstlisting}  
 \lstinputlisting[language=C]{../test/outputs-aut/outputSize76-aut.txt} 
 	
-\newpage
+
 	\item \textit{\textbf{Verificamos que la cantidad de líneas sea 1024}}\\
 	Ejecutando el comando:
 	\begin{lstlisting}
